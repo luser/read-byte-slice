@@ -1,0 +1,21 @@
+[package]
+name = "read-byte-slice"
+authors = ["Ted Mielczarek <ted@mielczarek.org>"]
+version = "0.1.0"
+license = "MIT/Apache-2.0"
+readme = "README.md"
+keywords = ["chunk", "bytes", "iterator"]
+repository = "https://github.com/luser/read-byte-slice"
+homepage = "https://github.com/luser/read-byte-slice"
+documentation = "https://docs.rs/read-byte-slice"
+build = "build.rs"
+description = "An iterator over chunks of bytes as slices from an underlying reader."
+
+[dependencies]
+fallible-streaming-iterator = "0.1.5"
+
+[build-dependencies]
+skeptic = "0.12.3"
+
+[dev-dependencies]
+skeptic = "0.12.3"
