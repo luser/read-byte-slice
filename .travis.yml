@@ -1,0 +1,7 @@
+language: rust
+os:
+- linux
+rust:
+  - nightly
+  - beta
+  - stable

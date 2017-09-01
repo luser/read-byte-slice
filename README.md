@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/luser/read-byte-slice.svg?branch=master)](https://travis-ci.org/luser/read-byte-slice) [![crates.io](https://img.shields.io/crates/v/read-byte-slice.svg)](https://crates.io/crates/read-byte-slice) [![](https://docs.rs/read-byte-slice/badge.svg)](https://docs.rs/read-byte-slice)
+
 This crate implements a type `ByteSliceIter` that reads bytes from a reader and allows iterating
 over them as slices with a maximum length, similar to the [`chunks`] method on slices.
 
