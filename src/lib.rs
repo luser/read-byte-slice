@@ -93,7 +93,26 @@ where
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    fn sliced(b: &[u8], size: usize) -> Vec<Vec<u8>> {
+        let mut v = vec![];
+        let mut iter = ByteSliceIter::new(b, size);
+        while let Some(chunk) = iter.next().unwrap() {
+            v.push(chunk.to_owned());
+        }
+        v
+    }
+
     #[test]
-    fn it_works() {
+    fn test_simple() {
+        let bytes = b"0123456789abcdef";
+        assert_eq!(sliced(bytes, 4), bytes.chunks(4).collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn test_non_even() {
+        let bytes = b"0123456789abcd";
+        assert_eq!(sliced(bytes, 4), bytes.chunks(4).collect::<Vec<_>>());
     }
 }
