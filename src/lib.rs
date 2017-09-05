@@ -31,6 +31,10 @@ pub use fallible_streaming_iterator::FallibleStreamingIterator;
 use std::cmp;
 use std::io::{self, BufRead, BufReader, Read};
 
+// This is internal to the standard library:
+// https://github.com/rust-lang/rust/blob/6ccfe68076abc78392ab9e1d81b5c1a2123af657/src/libstd/sys_common/io.rs#L10
+const DEFAULT_BUF_SIZE: usize = 8 * 1024;
+
 /// An iterator over byte slices from a `Read` that reuses the same buffer instead of allocating.
 ///
 /// See the [crate documentation] for example usage.
@@ -53,7 +57,7 @@ where
     /// chunk will not have length `size`.
     pub fn new(inner: R, size: usize) -> ByteSliceIter<R> {
         ByteSliceIter {
-            inner: BufReader::new(inner),
+            inner: BufReader::with_capacity(cmp::max(size, DEFAULT_BUF_SIZE), inner),
             // It would be nice to not need the extra buffer here, but there isn't an API to
             // ask BufReader for its current buffer without reading more, and
             // `FallibleStreamingIterator::get` doesn't return a `Result`.
@@ -104,15 +108,37 @@ mod tests {
         v
     }
 
+    fn test<T: AsRef<[u8]>>(bytes: T, size: usize) {
+        let bytes = bytes.as_ref();
+        let a = sliced(bytes, size);
+        let b = bytes.chunks(size).collect::<Vec<_>>();
+        if a != b {
+            panic!("chunks are not equal!
+read-byte-slice produced {} chunks with lengths: {:?}
+slice.chunks produced {} chunks with lengths: {:?}",
+                   a.len(),
+                   a.iter().map(|c| c.len()).collect::<Vec<_>>(),
+                   b.len(),
+                   b.iter().map(|c| c.len()).collect::<Vec<_>>());
+        }
+    }
+
     #[test]
     fn test_simple() {
         let bytes = b"0123456789abcdef";
-        assert_eq!(sliced(bytes, 4), bytes.chunks(4).collect::<Vec<_>>());
+        test(bytes, 4);
     }
 
     #[test]
     fn test_non_even() {
         let bytes = b"0123456789abcd";
-        assert_eq!(sliced(bytes, 4), bytes.chunks(4).collect::<Vec<_>>());
+        test(bytes, 4);
+    }
+
+    #[test]
+    fn test_chunks_larger_than_bufread_default_buffer() {
+        let bytes = (0..DEFAULT_BUF_SIZE * 4).map(|i| (i % 256) as u8).collect::<Vec<u8>>();
+        let size = DEFAULT_BUF_SIZE * 2;
+        test(bytes, size);
     }
 }
