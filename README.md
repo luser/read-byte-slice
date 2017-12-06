@@ -7,14 +7,24 @@ It is implemented as a [`FallibleStreamingIterator`] so that it can reuse its bu
 allocate for each chunk. (That trait is re-exported here for convenience.)
 
 # Example
-```rust,skt-main
-use read_byte_slice::{ByteSliceIter, FallibleStreamingIterator};
+```rust
+extern crate read_byte_slice;
 
-let bytes = b"0123456789abcdef0123456789abcdef";
-// Iterate over the bytes in 8-byte chunks.
-let mut iter = ByteSliceIter::new(&bytes[..], 8);
-while let Some(chunk) = iter.next()? {
+use read_byte_slice::{ByteSliceIter, FallibleStreamingIterator};
+use std::io;
+
+fn work() -> io::Result<()> {
+  let bytes = b"0123456789abcdef0123456789abcdef";
+  // Iterate over the bytes in 8-byte chunks.
+  let mut iter = ByteSliceIter::new(&bytes[..], 8);
+  while let Some(chunk) = iter.next()? {
     println!("{:?}", chunk);
+  }
+  Ok(())
+}
+
+fn main() {
+  work().unwrap();
 }
 ```
 

@@ -5,3 +5,7 @@ rust:
   - nightly
   - beta
   - stable
+
+script:
+  - cargo build --verbose
+  - RUST_BACKTRACE=1 cargo test --verbose
